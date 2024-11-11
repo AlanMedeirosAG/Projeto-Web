@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="../styles/logineregister.css" rel="stylesheet" type="text/css">
+    <title>WebSite</title>
+</head>
+<body>
+
+<div class="login-screen">
+    <form id="login-form" class="active" action="javascript:void(0);">
+        <div class="form-group sign-in-form">
+            <h1 class="login-title">Login</h1>
+            <div class="email-label">
+                <label for="login-username">Email:</label>
+                <input type="email" id="login-username" class="username" name="username" required>
+            </div>
+            <div class="password-label">
+                <label for="login-password">Senha:</label>
+                <input type="password" id="login-password" class="password" name="password" required>
+            </div>
+            <button type="submit" class="form-button">Entrar</button>
+            <p class="sign-up-button">Ainda não está cadastrado? Cadastre-se</p>
+            <p class="switch-to-librarian">Login como Bibliotecário</p>
+        </div>
+    </form>
+
+    <form id="loginbibliotecario-form" class="form" action="javascript:void(0);">
+        <div class="form-group sign-in-form">
+            <h1 class="login-title">Login Bibliotecário</h1>
+            <div class="email-label">
+                <label for="loginbibliotecario-username">Email:</label>
+                <input type="email" id="loginbibliotecario-username" class="username" name="username" required>
+            </div>
+            <div class="password-label">
+                <label for="loginbibliotecario-password">Senha:</label>
+                <input type="password" id="loginbibliotecario-password" class="password" name="password" required>
+            </div>
+            <button type="submit" class="form-button">Entrar</button>
+            <p class="sign-up-button">Ainda não está cadastrado? Cadastre-se</p>
+            <p class="switch-to-user">Voltar ao Login de Usuário</p>
+        </div>
+    </form>
+
+    <form id="register-form" class="form" action="javascript:void(0);">
+        <div class="form-group sign-up-form">
+            <h1 class="login-title">Registrar</h1>
+            <div class="nome-label">
+                <label for="register-nome">Nome:</label>
+                <input type="text" id="register-nome" class="nome-input" name="name" required>
+            </div>
+            <div class="email-label">
+                <label for="register-username">Email:</label>
+                <input type="email" id="register-username" class="username" name="username" required>
+            </div>
+            <div class="password-label">
+                <label for="register-password">Senha:</label>
+                <input type="password" id="register-password" class="password" name="password" required>
+            </div>
+            <button type="submit" class="form-button">Registrar</button>
+            <p class="switch-to-user">Já tem uma conta? Voltar ao Login</p>
+        </div>
+    </form>
+</div>
+
+<script src="../scripts/loginRegistro.js"></script>
+</body>
+</html>
+

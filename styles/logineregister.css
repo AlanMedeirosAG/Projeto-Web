@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    font-family: 'Montserrat',sans-serif;
+}
+
+body {
+    background-color: #4c4e4c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-screen {
+    position: relative;
+    width: 300px;
+    height: 500px;
+}
+
+
+.login-title {
+    max-width: 500px;
+    text-align: center;
+}
+
+.form-group {
+    background-color: #757a75;
+    text-align: left;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+/* Botão de envio */
+.form-button {
+    border-radius: 100px;
+    margin-left: auto;
+    margin-top: 20px;
+    margin-right: auto;
+    display: block;
+    width: 200px;
+    text-decoration: #cccccc;
+    background-color: #757a75;
+}
+
+/* Espaçamento entre labels e campos */
+.nome-label,
+.email-label,
+.password-label {
+    margin-bottom: 10px;
+    padding-right: 50px;
+}
+
+#register-nome, #register-username, #register-password,
+#login-username, #login-password,
+#loginbibliotecario-username, #loginbibliotecario-password {
+    width: 280px; /* Ajusta para usar a largura total do formulário */
+    border-radius: 50px;
+}
+
+.sign-in-form, .sign-up-form {
+    width: 100%; /* Garante que os formulários ocupem a largura total */
+}
+
+.sign-in-form {
+    z-index: 2; /* Mantém o login de usuário em cima ao alternar */
+}
+
+.sign-up-form {
+    z-index: 1; /* Para o formulário de registro */
+}
+
+.sign-up-button,
+.sign-in-button {
+    max-width: 500px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.switch-to-librarian,
+.switch-to-user {
+    max-width: 500px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.form {
+    display: none; /* Esconde todos os formulários inicialmente */
+    position: absolute; /* Para evitar sobreposição */
+    top: 0; /* Centraliza verticalmente */
+    left: 0; /* Centraliza horizontalmente */
+    width: 100%; /* Permite que o formulário use todo o espaço */
+}
+
+
+.form.active {
+    display: block; /* Mostra o formulário ativo */
+    opacity: 1; /* Para mostrar o formulário ativo */
+    transition: opacity 0.5s ease-in-out; /* Transição suave ao mostrar */
+}
+

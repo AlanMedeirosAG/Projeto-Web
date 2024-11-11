@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat',sans-serif;
+    text-decoration: none;  /*Tira as linhas de sublinhamento*/
+    list-style: none; /*Tira os pontos do formato da lista*/
+}
+
+body {
+    background-color: #4c4e4c;
+    width: auto;
+}
+
+.navigation{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background: #757a75;
+    transition: all 0.5s;
+}
+
+.navigation ul{
+    display:flex;
+    align-items: center;
+    gap: 4em;
+}
+
+.navigation ul li a{
+    color:#000000;
+    font-size: 17px;
+    font-weight: 500;
+    transition:all 0.5s;
+    flex: auto;
+}
+
+.navigation i {
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.search-icon{
+    height: 30px;
+    width: 30px;
+}
+
+.search-book{
+    width: 20rem;
+    height: 2rem;
+    border-radius: 100px;
+}
+
+.menu-item{
+    font-size: 1.5rem;
+    margin-left: 100px;
+}
+
+.addbook-button{
+    color:#cccccc;
+    border-radius: 100px;
+    height: 60px;
+    width: 200px;
+    margin-top: 20px;
+    text-decoration: #cccccc;
+    background-color: #4c4e4c;
+    border-color: black;
+}
