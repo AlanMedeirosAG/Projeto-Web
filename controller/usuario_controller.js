@@ -47,6 +47,12 @@ const deleteUsuario = async (req, res) => {
 // Lógica para login de usuário
 const getUsuarioLogin = async (req, res) => {
     const { email, senha } = req.body; // Obter e-mail e senha do corpo da requisição
+
+    // Verificar se o corpo da requisição contém 'email' e 'senha'
+    if (!email || !senha) {
+        return res.status(400).json({ message: "E-mail e senha são obrigatórios!" });
+    }
+
     try {
         const usuario = await usuarioModel.getUsuarioLogin(email, senha); // Passar e-mail e senha para o model
         if (usuario) {

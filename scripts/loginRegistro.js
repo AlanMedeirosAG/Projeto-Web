@@ -80,8 +80,12 @@ document.addEventListener("DOMContentLoaded", function() {
         const email = document.getElementById('loginbibliotecario-username').value;
         const senha = document.getElementById('loginbibliotecario-password').value;
 
+        // Testes
+        console.log("Email capturado:", email);
+        console.log("Senha capturada:", senha);
+
         try {
-            const response = await fetch('http://localhost:3000/loginbibliotecario', {
+            const response = await fetch('http://localhost:3000/bibliotecario/loginbibliotecario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

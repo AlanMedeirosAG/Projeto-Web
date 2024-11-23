@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const { createServerConnection, executeQuery, readQuery } = require("../config/connection");
 
 // Criação de bibliotecário
@@ -13,8 +12,8 @@ const createBibliotecario = async (data) => {
             throw new Error("E-mail já cadastrado.");
         }
 
-        const hashedPassword = await bcrypt.hash(data.senha, 10);  // Hash da senha
-        await executeQuery(connection, query, [data.nome, data.email, hashedPassword, data.tipo_usuario]);
+        // Cria usuario
+        await executeQuery(connection, query, [data.nome, data.email, data.senha, data.tipo_usuario]);
         console.log("Bibliotecário criado com sucesso!");
     } catch (error) {
         console.error(`Erro ao inserir bibliotecário: ${error.message}`);
@@ -46,7 +45,7 @@ const getBibliotecarioByEmail = async (email) => {
     const connection = createServerConnection();
 
     try {
-        const resultado = await readQuery(connection, query, [email]);
+        const resultado = await readQuery(query, [email]);
         return resultado.length > 0 ? resultado[0] : null;
     } catch (error) {
         console.error(`Erro ao buscar bibliotecário por email: ${error.message}`);
@@ -58,35 +57,41 @@ const getBibliotecarioByEmail = async (email) => {
 
 // Buscar login de bibliotecário
 const getBibliotecarioLogin = async (email, senha) => {
-    const query = "SELECT * FROM usuario WHERE email = ?";
+    const query = "SELECT * FROM usuario WHERE email = ? AND tipo_usuario = 'bibliotecario'";
     const connection = createServerConnection();
 
     try {
-        const resultado = await readQuery(connection, query, [email]);
+        console.log("Conectando ao banco e executando a query...");
+        const resultado = await readQuery(query, [email]);
 
         if (resultado.length > 0) {
             const bibliotecario = resultado[0];
-            const passwordMatch = await bcrypt.compare(senha, bibliotecario.senha);
-            if (passwordMatch) {
+
+            // Verifica se a senha corresponde diretamente
+            if (senha === bibliotecario.senha) {
+                console.log("Login bem-sucedido");
                 return {
-                    id: bibliotecario.id,
-                    nome: bibliotecario.nome,
                     email: bibliotecario.email,
-                    tipo: bibliotecario.tipo_usuario
+                    tipo: bibliotecario.tipo_usuario,
+                    id: bibliotecario.id,
+                    nome: bibliotecario.nome
                 };
             } else {
-                throw new Error("Senha incorreta");
+                console.log("Senha incorreta");
+                return null; // Retorna null se a senha estiver incorreta
             }
         } else {
-            throw new Error("E-mail incorreto");
+            console.log("Bibliotecário não encontrado");
+            return null; // Retorna null se não encontrar o bibliotecário
         }
     } catch (error) {
         console.error(`Erro ao realizar login: ${error.message}`);
         throw error;
     } finally {
-        connection.end();
+        connection.end(); // Fecha a conexão com o banco de dados
     }
 };
+
 
 // Atualizar bibliotecário
 const updateBibliotecario = async (id, data) => {
@@ -104,8 +109,7 @@ const updateBibliotecario = async (id, data) => {
 
         const params = [data.nome, data.email];
         if (data.senha) {
-            const hashedPassword = await bcrypt.hash(data.senha, 10);
-            params.push(hashedPassword);
+            params.push(data.senha);
         }
         params.push(id);
         await executeQuery(connection, query, params);

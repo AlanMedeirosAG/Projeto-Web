@@ -1,144 +1,124 @@
-const bcrypt = require('bcrypt');
-const { createServerConnection, executeQuery, readQuery } = require("../config/connection");
-
-// Criação de bibliotecário
-const createBibliotecario = async (data) => {
-    const query = "INSERT INTO bibliotecario (nome, email, senha, tipo_usuario) VALUES (?, ?, ?, ?)";
-    const connection = createServerConnection();
-
-    try {
-        // Verificar se o e-mail já existe
-        const existingBibliotecario = await getBibliotecarioByEmail(data.email);
-        if (existingBibliotecario) {
-            throw new Error("E-mail já cadastrado.");
-        }
-
-        const hashedPassword = await bcrypt.hash(data.senha, 10);  // Hash da senha
-        await executeQuery(connection, query, [data.nome, data.email, hashedPassword, data.tipo_usuario]);
-        console.log("Bibliotecário criado com sucesso!");
-    } catch (error) {
-        console.error(`Erro ao inserir bibliotecário: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-// Retornar todos os bibliotecários
-const getBibliotecarios = async () => {
-    const query = "SELECT * FROM bibliotecario";
-    const connection = createServerConnection();
-
-    try {
-        const resultado = await readQuery(query);
-        return resultado;
-    } catch (error) {
-        console.error(`Erro ao buscar bibliotecários: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-// Buscar bibliotecário por email
-const getBibliotecarioByEmail = async (email) => {
-    const query = "SELECT * FROM bibliotecario WHERE email = ?";
-    const connection = createServerConnection();
-
-    try {
-        const resultado = await readQuery(query, [email]);
-        return resultado.length > 0 ? resultado[0] : null;
-    } catch (error) {
-        console.error(`Erro ao buscar bibliotecário por email: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-// Buscar login de bibliotecário
-const getBibliotecarioLogin = async (email, senha) => {
-    const query = "SELECT * FROM bibliotecario WHERE email = ?";
-    const connection = createServerConnection();
-
-    try {
-        const resultado = await readQuery(query, [email]);
-
-        if (resultado.length > 0) {
-            const bibliotecario = resultado[0];
-            const passwordMatch = await bcrypt.compare(senha, bibliotecario.senha);
-            if (passwordMatch) {
-                return {
-                    id: bibliotecario.id,
-                    nome: bibliotecario.nome,
-                    email: bibliotecario.email,
-                    tipo: bibliotecario.tipo_usuario
-                };
-            } else {
-                throw new Error("Senha incorreta");
-            }
-        } else {
-            throw new Error("E-mail incorreto");
-        }
-    } catch (error) {
-        console.error(`Erro ao realizar login: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-// Atualizar bibliotecário
-const updateBibliotecario = async (id, data) => {
-    const query = "UPDATE bibliotecario SET nome = ?, email = ?" + (data.senha ? ", senha = ?" : "") + " WHERE id = ?";
-    const connection = createServerConnection();
-
-    try {
-        // Verifica se o novo e-mail já existe (caso seja alterado)
-        if (data.email) {
-            const existingBibliotecario = await getBibliotecarioByEmail(data.email);
-            if (existingBibliotecario && existingBibliotecario.id !== id) {
-                throw new Error("E-mail já está em uso.");
-            }
-        }
-
-        const params = [data.nome, data.email];
-        if (data.senha) {
-            const hashedPassword = await bcrypt.hash(data.senha, 10);
-            params.push(hashedPassword);
-        }
-        params.push(id);
-        await executeQuery(connection, query, params);
-        console.log("Bibliotecário atualizado com sucesso!");
-    } catch (error) {
-        console.error(`Erro ao atualizar bibliotecário: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-// Deletar bibliotecário
-const deleteBibliotecario = async (id) => {
-    const query = "DELETE FROM bibliotecario WHERE id = ?";
-    const connection = createServerConnection();
-
-    try {
-        await executeQuery(connection, query, [id]);
-        console.log("Bibliotecário deletado com sucesso!");
-    } catch (error) {
-        console.error(`Erro ao deletar bibliotecário: ${error.message}`);
-        throw error;
-    } finally {
-        connection.end();
-    }
-};
-
-module.exports = {
+const {
     createBibliotecario,
     getBibliotecarios,
     getBibliotecarioByEmail,
     getBibliotecarioLogin,
     updateBibliotecario,
     deleteBibliotecario
+} = require('../model/bibliotecario_model');
+
+// Criar bibliotecário
+const criarBibliotecario = async (req, res) => {
+    try {
+        const { nome, email, senha, tipo_usuario } = req.body;
+
+        // Validação dos dados de entrada
+        if (!nome || !email || !senha || !tipo_usuario) {
+            return res.status(400).json({ message: "Todos os campos são obrigatórios!" });
+        }
+
+        const data = { nome, email, senha, tipo_usuario };
+        await createBibliotecario(data);
+
+        return res.status(201).json({ message: "Bibliotecário criado com sucesso!" });
+    } catch (error) {
+        console.error(`Erro ao criar bibliotecário: ${error.message}`);
+        return res.status(500).json({ message: `Erro ao criar bibliotecário: ${error.message}` });
+    }
+};
+
+// Obter todos os bibliotecários
+const obterBibliotecarios = async (req, res) => {
+    try {
+        const bibliotecarios = await getBibliotecarios();
+        return res.status(200).json(bibliotecarios);
+    } catch (error) {
+        console.error(`Erro ao obter bibliotecários: ${error.message}`);
+        return res.status(500).json({ message: `Erro ao obter bibliotecários: ${error.message}` });
+    }
+};
+
+// Obter bibliotecário por e-mail
+const obterBibliotecarioPorEmail = async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        const bibliotecario = await getBibliotecarioByEmail(email);
+        if (!bibliotecario) {
+            return res.status(404).json({ message: "Bibliotecário não encontrado!" });
+        }
+        return res.status(200).json(bibliotecario);
+    } catch (error) {
+        console.error(`Erro ao buscar bibliotecário por e-mail: ${error.message}`);
+        return res.status(500).json({ message: `Erro ao buscar bibliotecário por e-mail: ${error.message}` });
+    }
+};
+
+// Realizar login de bibliotecário
+const loginBibliotecario = async (email, senha) => {
+    try {
+        // Verifica se ambos os campos (email e senha) foram fornecidos
+        if (!email || !senha) {
+            throw new Error("E-mail e senha são obrigatórios!");
+        }
+
+        console.log("Tentando buscar o bibliotecário...");
+        const bibliotecario = await getBibliotecarioLogin(email, senha);
+
+        // Se o login falhou (senha ou e-mail incorretos)
+        if (!bibliotecario) {
+            throw new Error("E-mail ou senha incorretos!");
+        }
+
+        // Retorna os dados do bibliotecário se o login for bem-sucedido
+        console.log("Login bem-sucedido. Dados do bibliotecário:", bibliotecario);
+        return {
+            id: bibliotecario.id,
+            nome: bibliotecario.nome,
+            email: bibliotecario.email,
+            tipo: bibliotecario.tipo
+        };
+    } catch (error) {
+        console.error(`Erro ao realizar login: ${error.message}`);
+        throw error; // Lança o erro para ser tratado pela rota chamadora
+    }
+};
+
+
+// Atualizar bibliotecário
+const atualizarBibliotecario = async (req, res) => {
+    const { id } = req.params;
+    const { nome, email, senha } = req.body;
+
+    try {
+        const data = { nome, email, senha };
+        await updateBibliotecario(id, data);
+
+        return res.status(200).json({ message: "Bibliotecário atualizado com sucesso!" });
+    } catch (error) {
+        console.error(`Erro ao atualizar bibliotecário: ${error.message}`);
+        return res.status(500).json({ message: `Erro ao atualizar bibliotecário: ${error.message}` });
+    }
+};
+
+// Deletar bibliotecário
+const deletarBibliotecario = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await deleteBibliotecario(id);
+        return res.status(200).json({ message: "Bibliotecário deletado com sucesso!" });
+    } catch (error) {
+        console.error(`Erro ao deletar bibliotecário: ${error.message}`);
+        return res.status(500).json({ message: `Erro ao deletar bibliotecário: ${error.message}` });
+    }
+};
+
+module.exports = {
+    criarBibliotecario,
+    obterBibliotecarios,
+    obterBibliotecarioPorEmail,
+    loginBibliotecario,
+    atualizarBibliotecario,
+    deletarBibliotecario
 };
